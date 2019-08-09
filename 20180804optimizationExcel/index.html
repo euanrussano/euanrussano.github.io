@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Using MS Excel Solver for Process Optimization | Fundamentals of Engineering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="A common problem which many engineers face on their jobs is process optimization. How to maximize a profit or how to minimize costs of a determined process so as to make it the most profitable possibl">
+<meta name="keywords" content="ProcessOptimization,Excel,Solver">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Using MS Excel Solver for Process Optimization">
+<meta property="og:url" content="http://eua.russano.github.io/20180804optimizationExcel/index.html">
+<meta property="og:site_name" content="Fundamentals of Engineering">
+<meta property="og:description" content="A common problem which many engineers face on their jobs is process optimization. How to maximize a profit or how to minimize costs of a determined process so as to make it the most profitable possibl">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://eua.russano.github.io/images/20180804optimizationExcel/extraction_process.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20180804optimizationExcel/solver_screen.png">
+<meta property="og:updated_time" content="2019-08-09T02:53:40.438Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Using MS Excel Solver for Process Optimization">
+<meta name="twitter:description" content="A common problem which many engineers face on their jobs is process optimization. How to maximize a profit or how to minimize costs of a determined process so as to make it the most profitable possibl">
+<meta name="twitter:image" content="http://eua.russano.github.io/images/20180804optimizationExcel/extraction_process.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Fundamentals of Engineering" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fundamentals of Engineering</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://eua.russano.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-20180804optimizationExcel" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/20180804optimizationExcel/" class="article-date">
+  <time datetime="2018-08-04T04:00:00.000Z" itemprop="datePublished">2018-08-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Using MS Excel Solver for Process Optimization
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>A common problem which many engineers face on their jobs is process optimization. How to maximize a profit or how to minimize costs of a determined process so as to make it the most profitable possible? There is a diversity of mathematical techniques which can be used to solve such problem. Most of these techniques differ in its applicability when a problem is linear or non-linear.</p>
+<a id="more"></a>
+<p>A optimization problem can be solved using computational tools. Currently, there is a huge amount of such tools, and the choice of it depends on the complexity of the problem, the experience and familiarity of the engineer with the tool as well as time and money available.</p>
+<p>MS Excel is one of the most popular, widespread softwares for data analysis available in the market. It possesses a great visualization power because of its spreadsheets functionality. Its functions and tools does not require the too much expertise from the user, nor programming knowledge, unless the user wants to learn advanced functionalities (VBA programming).</p>
+<p>For optimization purposes, it is not necessary that the user possesses advanced domain of the software. The problem is completely described in the spreadsheet(s) and after setting it up, an add-in called Solver may be used to maximize or minimize certain characteristics of the process.</p>
+<p>For the purpose of this post, consider the following example extracted from COQ-897 Otimização de Processos (PEQ/COPPE/UFRJ).</p>
+<p><strong>Example 1.2:</strong> In the process of extraction using pure solvent, as illustrated below, one desires to find the operating condition with the best profit possible.</p>
+<p><img src="/images/20180804optimizationExcel/extraction_process.png" alt="Extraction Process" title="Extraction Process"></p>
+<p>Where <em>Wi</em> and <em>W’i</em> are solvent mass flow rates, <em>F</em> is water mass flow rate, <em>xi</em> is the solute mass per mass unit of water and yi is the solute mass per mass unit of solvent. An economic analysis of the problem conducts to the following profit expression:</p>
+<p>profit: L = R – C</p>
+<p>revenue: R = Ps (W’1 y1 + W’2 y2)</p>
+<p>cost: C = Px (W1 + W2)</p>
+<p>constraint: R &gt; C</p>
+<p>Where Os is the solute price while in the extract, Px is the price of pure solvent. A technical analysis revealed the following constraint relations:</p>
+<p>Solute Mass Balance:</p>
+<p>\begin{equation}<br>F x_0 – W’_1 y_1 – F x_1 = 0<br>\end{equation}</p>
+<p>\begin{equation}<br>F x_1 – W’_2 y_2 – F x_2 = 0<br>\end{equation}</p>
+<p>Solvent Mass Balance:</p>
+<p>\begin{equation}<br>W_1 – W’_1 – s F = 0<br>\end{equation}</p>
+<p>\begin{equation}<br>W_2 + s F – W’_2 – s F = 0<br>\end{equation}</p>
+<p>Equilibrium relations:</p>
+<p>\begin{equation}<br>y_1 = m x_1<br>\end{equation}</p>
+<p>\begin{equation}<br>y_2 = m x_2<br>\end{equation}</p>
+<p>Where <script type="math/tex">s</script> is the solubility of the solvent in water(solvent mass / mass of water) and m is the equilibrium constant between phases. Therefore, given <script type="math/tex">F</script>, <script type="math/tex">x_0</script>, <script type="math/tex">s</script>, <script type="math/tex">m</script>, <script type="math/tex">Ps</script> and <script type="math/tex">Px</script>, the problem of extracting the solute from water in the most profitable manner consists in maximizing L as a function of the operating conditions.</p>
+<p>Suppose:  </p>
+<p><script type="math/tex">F = 1.0 \times 10^4</script> kg-water / h,  </p>
+<p><script type="math/tex">x_0 = 0.02</script> kg-solute / kg-water,  </p>
+<p><script type="math/tex">s = 7.0 \times 10^{-4}</script> kg-solvent / kg-water,  </p>
+<p><script type="math/tex">m = 4.0</script> kg-water / kg solvent,  </p>
+<p><script type="math/tex">Ps = 0.4</script> USD / kg-solute and  </p>
+<p><script type="math/tex">Px = 0.01</script> USD / kg-solvent.</p>
+<p>We want to solve such problem using the software MS Excel. The first step consists in annotating all the inputs of the system in the following manner (use a spreadsheet in Excel - first line and column should be the same in your spreadsheet):</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">A</th>
+<th style="text-align:left">B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">4</td>
+<td style="text-align:left">Ps</td>
+<td style="text-align:left">0.4000</td>
+</tr>
+<tr>
+<td style="text-align:left">5</td>
+<td style="text-align:left">Px</td>
+<td style="text-align:left">0.0100</td>
+</tr>
+<tr>
+<td style="text-align:left">6</td>
+<td style="text-align:left">s</td>
+<td style="text-align:left">0.0007</td>
+</tr>
+<tr>
+<td style="text-align:left">7</td>
+<td style="text-align:left">m</td>
+<td style="text-align:left">4.0000</td>
+</tr>
+<tr>
+<td style="text-align:left">8</td>
+<td style="text-align:left">F</td>
+<td style="text-align:left">10000.0</td>
+</tr>
+<tr>
+<td style="text-align:left">9</td>
+<td style="text-align:left">x0</td>
+<td style="text-align:left">0.0200</td>
+</tr>
+<tr>
+<td style="text-align:left">10</td>
+<td style="text-align:left">y0</td>
+<td style="text-align:left">0.0800</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The operating conditions can also be inserted in Excel at their own column, which will be afterwards recalculated by Excel using Solver:</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">D</th>
+<th style="text-align:left">E</th>
+<th style="text-align:left">F</th>
+<th style="text-align:left">G</th>
+<th style="text-align:left">H</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">4</td>
+<td style="text-align:left">Unit</td>
+<td style="text-align:left">W</td>
+<td style="text-align:left">W’</td>
+<td style="text-align:left">x</td>
+<td style="text-align:left">y</td>
+</tr>
+<tr>
+<td style="text-align:left">5</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">1000</td>
+<td style="text-align:left">1000</td>
+<td style="text-align:left">0.01</td>
+<td style="text-align:left">0.01</td>
+</tr>
+<tr>
+<td style="text-align:left">6</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">1000</td>
+<td style="text-align:left">1000</td>
+<td style="text-align:left">0.01</td>
+<td style="text-align:left">0.01</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Observe that these are initial conditions of the problem, thus the chosen value may not be physically feasible, i.e do not fulfill mass balance constraints. That will not be a problem because the constraints will be considered during the optimization procedure, so we will arrive in a physically feasible optimum.</p>
+<p>Now use the equations for income, costs, profits and constraints to have cells where these values are calculated. In my spreadsheet, I used the following Excel formulas:</p>
+<p>Income (cell C13): <code>=$B$4*(F5*H5+F6*H6)</code></p>
+<p>Costs (cell C14): <code>=B5*SUM(E5:E6)</code></p>
+<p>Profit (cell C15): <code>=C13-C14</code></p>
+<p>Constraints:<br>Solute Unit 1 (cell C17):<code>=$B$8*$B$9-F5*H5-$B$8*G5</code><br>Solvent Unit 1 (cell D17):<code>=E5-F5-$B$6*$B$8</code><br>Equilibrium Unit 1 (cell E17):<code>=H5-$B$7*G5</code></p>
+<p>Solute Unit 2 (cell C18): <code>=$B$8*$G$5-F6*H6-$B$8*G6</code><br>Solvent Unit 2 (cell D18): <code>=E6-F6-$B$6*$B$8</code><br>Equilibrium Unit 2 (cell E18): <code>=H6-$B$7*G6</code></p>
+<p>And these cells are defined in Excel using the following format:</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">A</th>
+<th style="text-align:left">B</th>
+<th style="text-align:left">C</th>
+<th style="text-align:left">D</th>
+<th style="text-align:left">E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">16</td>
+<td style="text-align:left">Constraints</td>
+<td style="text-align:left">Unit</td>
+<td style="text-align:left">Solute</td>
+<td style="text-align:left">Solvent</td>
+<td style="text-align:left">Equilibrium</td>
+</tr>
+<tr>
+<td style="text-align:left">17</td>
+<td style="text-align:left">Unit 1</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">90</td>
+<td style="text-align:left">-7</td>
+<td style="text-align:left">-0.03</td>
+</tr>
+<tr>
+<td style="text-align:left">18</td>
+<td style="text-align:left">Unit 2</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">-10</td>
+<td style="text-align:left">-7</td>
+<td style="text-align:left">-0.03</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The values in the cell are not inserted, but automatically calculated by excel using the formulas previously stated. With this the spreadsheet is completely configured.</p>
+<p>After configuring everything, it is time to proceed to optimization. To do that, start Solver (it is located in the tab Data in Excel. If you do not find it, it is necessary to configure it in Excel Options. Write a comment if you need any help with that). The solver screen is as shown below.</p>
+<p><img src="/images/20180804optimizationExcel/solver_screen.png" alt="Solver Window" title="Solver Window"></p>
+<p>Make sure you add the current optimization cell, chose the “Max” radio button and add the constraints with the Add button and your Solver window should look the same as the figure above. Then simply click Solve and see how the operating conditions change, in such a way that the constraints are almost zero (or zero exactly) and the Profit variable is maximized. You may slightly change the operating conditions to check if the profit is really the maximum possible.</p>
+<p>The results for the optimization should be:</p>
+<p>Income (cell C13):43.16</p>
+<p>Costs (cell C14):23.82</p>
+<p>Profit (cell C15):19.34</p>
+<p>And the final operating conditions:</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">D</th>
+<th style="text-align:left">E</th>
+<th style="text-align:left">F</th>
+<th style="text-align:left">G</th>
+<th style="text-align:left">H</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">4</td>
+<td style="text-align:left">Unit</td>
+<td style="text-align:left">W</td>
+<td style="text-align:left">W’</td>
+<td style="text-align:left">x</td>
+<td style="text-align:left">y</td>
+</tr>
+<tr>
+<td style="text-align:left">5</td>
+<td style="text-align:left">1</td>
+<td style="text-align:left">1199.99</td>
+<td style="text-align:left">1183.99</td>
+<td style="text-align:left">0.0135</td>
+<td style="text-align:left">0.0542</td>
+</tr>
+<tr>
+<td style="text-align:left">6</td>
+<td style="text-align:left">2</td>
+<td style="text-align:left">1191.04</td>
+<td style="text-align:left">1184.04</td>
+<td style="text-align:left">0.00921</td>
+<td style="text-align:left">0.0368</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Download the spreadsheet configured <a href="/data/20180804optimizationExcel/example_optimization.xlsx">here!</a></strong></p>
+<p>In the next post, I will show you guys how to use other tool to solve the same problem. Do not miss it!</p>
+<p>Regards,<br>Euan</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://eua.russano.github.io/20180804optimizationExcel/" data-id="cjz3hr3xr0000vku6j4yway6h" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Excel/">Excel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ProcessOptimization/">ProcessOptimization</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/20180804optimizationPython/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Using Python for Process Optimization
+        
+      </div>
+    </a>
+  
+  
+    <a href="/20180731welcome/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Welcome</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PrinciplesOfEngineering/">PrinciplesOfEngineering</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ProcessOptimization/">ProcessOptimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scipy/">Scipy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/Numpy/" style="font-size: 10px;">Numpy</a> <a href="/tags/PrinciplesOfEngineering/" style="font-size: 10px;">PrinciplesOfEngineering</a> <a href="/tags/ProcessOptimization/" style="font-size: 20px;">ProcessOptimization</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/Scipy/" style="font-size: 10px;">Scipy</a> <a href="/tags/Solver/" style="font-size: 10px;">Solver</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/20180810unitsDimensions/">Units and Dimensions - What are the differences</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationPython/">Using Python for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationExcel/">Using MS Excel Solver for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180731welcome/">Welcome</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Euan Russano<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

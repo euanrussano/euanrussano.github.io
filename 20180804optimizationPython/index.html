@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Using Python for Process Optimization | Fundamentals of Engineering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Hello! In the last post I demonstrated how to use MS Excel software and its Solver tool to find the optimal operating point in a process. In this post, we will use the free Python programming languag">
+<meta name="keywords" content="Python,ProcessOptimization,Numpy,Scipy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Using Python for Process Optimization">
+<meta property="og:url" content="http://eua.russano.github.io/20180804optimizationPython/index.html">
+<meta property="og:site_name" content="Fundamentals of Engineering">
+<meta property="og:description" content="Hello! In the last post I demonstrated how to use MS Excel software and its Solver tool to find the optimal operating point in a process. In this post, we will use the free Python programming languag">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://eua.russano.github.io/images/python-logo.png">
+<meta property="og:updated_time" content="2019-08-09T03:00:44.860Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Using Python for Process Optimization">
+<meta name="twitter:description" content="Hello! In the last post I demonstrated how to use MS Excel software and its Solver tool to find the optimal operating point in a process. In this post, we will use the free Python programming languag">
+<meta name="twitter:image" content="http://eua.russano.github.io/images/python-logo.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Fundamentals of Engineering" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fundamentals of Engineering</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://eua.russano.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-20180804optimizationPython" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/20180804optimizationPython/" class="article-date">
+  <time datetime="2018-08-04T15:00:00.000Z" itemprop="datePublished">2018-08-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Using Python for Process Optimization
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/python-logo.png" alt="Python logo"></p>
+<p>Hello!</p>
+<p>In the last post I demonstrated how to use MS Excel software and its Solver tool to find the optimal operating point in a process.</p>
+<p>In this post, we will use the free <strong>Python</strong> programming language to solve the same problem. The use of <strong>Python</strong> in the academic and industrial environment has grown immensely, mainly due to the continuous development of new tools that increase its potential of application in several areas.</p>
+<a id="more"></a>
+<p>For this optimization problem, the Numpy and Scipy libraries are used, which contain functions that make Python very similar to Matlab and Scilab for problem solving in engineering, mathematics, physics, and many other areas.</p>
+<p>I’m not going to present a Python tutorial in this post, just the same application for the same problem solution that was presented in the last post I made. For very basic <strong>Python course for begineers</strong>, please refer to my online course on this <a href="https://fundamentals-of-engineering.coursify.me/" target="_blank" rel="noopener"><strong>link</strong></a>!</p>
+<p>Recalling, the problem is to maximize profit in the solvent extraction process by manipulating some system variables. The definition of the process can be found <a href="/20180804optimizationExcel/#more"><strong>here</strong></a>, under Example 1.2. This problem can be divided into two parts:</p>
+<ul>
+<li><p>the equation to be maximized (profit)</p>
+</li>
+<li><p>system constraints (mass balances, energy, equilibria, and all conservative equations)</p>
+</li>
+</ul>
+<p>First we will import the necessary libraries and define the system variables:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> scipy.optimize</span><br><span class="line"></span><br><span class="line"><span class="comment"># Problem variables</span></span><br><span class="line">F = <span class="number">1.0</span>*<span class="number">10</span>**<span class="number">4</span>    <span class="comment"># kg-water / h</span></span><br><span class="line">x0 = <span class="number">0.02</span>       <span class="comment"># kg-solute / kg-water</span></span><br><span class="line">s = <span class="number">7.0</span>*<span class="number">10</span>**<span class="number">-4</span>   <span class="comment"># kg-solvent / kg-water</span></span><br><span class="line">m = <span class="number">4.0</span>         <span class="comment"># kg-water / kg solvent</span></span><br><span class="line">Ps = <span class="number">0.4</span>        <span class="comment"># USD / kg-solute</span></span><br><span class="line">Px = <span class="number">0.01</span>       <span class="comment"># USD / kg-solvent.</span></span><br></pre></td></tr></table></figure>
+<p> The equation to be maximized can be defined in a function, here called “problem” (we use the problem variables as global variables):</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">problem</span><span class="params">(x)</span>:</span></span><br><span class="line"></span><br><span class="line">    W1 = x[<span class="number">0</span>] <span class="comment"># mass flow rate</span></span><br><span class="line">    W2 = x[<span class="number">1</span>] <span class="comment"># mass flow rate</span></span><br><span class="line">    W_1 = x[<span class="number">2</span>] <span class="comment"># mass flow rate</span></span><br><span class="line">    W_2 = x[<span class="number">3</span>] <span class="comment"># mass flow rate</span></span><br><span class="line">    x1 = x[<span class="number">4</span>]  <span class="comment"># liquid molar composition</span></span><br><span class="line">    y1 = x[<span class="number">5</span>]  <span class="comment"># gas molar composition</span></span><br><span class="line">    x2 = x[<span class="number">6</span>]  <span class="comment"># liquid molar composition</span></span><br><span class="line">    y2 = x[<span class="number">7</span>]  <span class="comment"># gas molar composition</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Income</span></span><br><span class="line">    R = Ps*(W_1*y1+W_2*y2)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Cost</span></span><br><span class="line">    C = Px*(W1+W2)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Profit (negative for minimization)</span></span><br><span class="line">    L = -(R-C)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> L</span><br></pre></td></tr></table></figure>
+<p>This function has as input the manipulated variables of the problem, and the output and the variable L, which constitutes profit. In this case we establish the profit as negative because by default a minimization will be done. For this is worth the relation:</p>
+<p>max x = -min x</p>
+<p>Finally, we define constraints of the problem in a function called here cons:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cons</span><span class="params">(x)</span>:</span></span><br><span class="line"></span><br><span class="line">    W1 = x[<span class="number">0</span>]</span><br><span class="line">    W2 = x[<span class="number">1</span>]</span><br><span class="line">    W_1 = x[<span class="number">2</span>]</span><br><span class="line">    W_2 = x[<span class="number">3</span>]</span><br><span class="line">    x1 = x[<span class="number">4</span>]</span><br><span class="line">    y1 = x[<span class="number">5</span>]</span><br><span class="line">    x2 = x[<span class="number">6</span>]</span><br><span class="line">    y2 = x[<span class="number">7</span>]</span><br><span class="line"></span><br><span class="line">    cons = np.zeros(<span class="number">6</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Solute mass balance</span></span><br><span class="line">    cons[<span class="number">0</span>] = F*x0-W_1*y1-F*x1</span><br><span class="line">    cons[<span class="number">1</span>] = F*x1-W_2*y2-F*x2</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Solvent mass balance</span></span><br><span class="line">    cons[<span class="number">2</span>] = W1-W_1-s*F</span><br><span class="line">    cons[<span class="number">3</span>] = W2+s*F-W_2-s*F</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Equilibrium relations</span></span><br><span class="line">    cons[<span class="number">4</span>] = y1-m*x1</span><br><span class="line">    cons[<span class="number">5</span>] = y2-m*x2</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> cons</span><br></pre></td></tr></table></figure>
+<p>Again, the function has as input the manipulated system variables, and as output the cons variable, which has six values, all must be zero. This is determined by creating the following dictionary in Python:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cons = [&#123;<span class="string">'type'</span>: <span class="string">'eq'</span>, <span class="string">'fun'</span>: constraints&#125;]</span><br></pre></td></tr></table></figure>
+<p>Now, just set the initial value of the manipulated variables (like zero for all) and call the “Solver” function in the scipy.optimize.minimize function as follows:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">xi = np.zeros(<span class="number">8</span>)</span><br><span class="line">x = scipy.optimize.minimize(problem, xi, constraints=&#123;<span class="string">'type'</span>:<span class="string">'eq'</span>,<span class="string">'fun'</span>:cons&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(<span class="string">'Optimization Result \n'</span>)</span><br><span class="line">print(<span class="string">'W1 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">0</span>]))</span><br><span class="line">print(<span class="string">'W2 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">1</span>]))</span><br><span class="line">print(<span class="string">'W_1 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">2</span>]))</span><br><span class="line">print(<span class="string">'W_2 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">3</span>]))</span><br><span class="line">print(<span class="string">'x1 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">4</span>]))</span><br><span class="line">print(<span class="string">'y1 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">5</span>]))</span><br><span class="line">print(<span class="string">'x2 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">6</span>]))</span><br><span class="line">print(<span class="string">'y2 = &#123;:.3f&#125;'</span>.format(x.x[<span class="number">7</span>]))</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Out[]:</span><br><span class="line">    Optimization Result </span><br><span class="line">    </span><br><span class="line">    W1 = 1190.455</span><br><span class="line">    W2 = 1184.538</span><br><span class="line">    W_1 = 1183.455</span><br><span class="line">    W_2 = 1184.538</span><br><span class="line">    x1 = 0.014</span><br><span class="line">    y1 = 0.054</span><br><span class="line">    x2 = 0.009</span><br><span class="line">    y2 = 0.037</span><br></pre></td></tr></table></figure>
+<p>You can compare these values with those obtained in Excel and you will see that they are very similar, if not the same. The same principle applied here can be used for the most diverse optimization problems.</p>
+<p><strong>Download the Jupyter notebook of this post <a href="/data/20180804optimizationPython/20180804optimizationPython.ipynb">here!</a></strong><br><strong>Download the Python code of this post <a href="/data/20180804optimizationPython/20180804optimizationPython.py">here!</a></strong></p>
+<p>Until the next post!</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://eua.russano.github.io/20180804optimizationPython/" data-id="cjz3i14rw0004vku6tsarxuy9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ProcessOptimization/">ProcessOptimization</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scipy/">Scipy</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/20180810unitsDimensions/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Units and Dimensions - What are the differences
+        
+      </div>
+    </a>
+  
+  
+    <a href="/20180804optimizationExcel/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Using MS Excel Solver for Process Optimization</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PrinciplesOfEngineering/">PrinciplesOfEngineering</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ProcessOptimization/">ProcessOptimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scipy/">Scipy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/Numpy/" style="font-size: 10px;">Numpy</a> <a href="/tags/PrinciplesOfEngineering/" style="font-size: 10px;">PrinciplesOfEngineering</a> <a href="/tags/ProcessOptimization/" style="font-size: 20px;">ProcessOptimization</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/Scipy/" style="font-size: 10px;">Scipy</a> <a href="/tags/Solver/" style="font-size: 10px;">Solver</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/20180810unitsDimensions/">Units and Dimensions - What are the differences</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationPython/">Using Python for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationExcel/">Using MS Excel Solver for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180731welcome/">Welcome</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Euan Russano<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
