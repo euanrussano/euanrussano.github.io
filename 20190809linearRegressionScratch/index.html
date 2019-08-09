@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Linear Regression from Scratch with Python | Fundamentals of Engineering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Among the variety of models available in Machine Learning, most people will agree that Linear Regression is the most basic and simple one. However, this model incorporates almost all of the basic conc">
+<meta name="keywords" content="Python,LinearRegression,GradientDescent,Scratch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linear Regression from Scratch with Python">
+<meta property="og:url" content="http://eua.russano.github.io/20190809linearRegressionScratch/index.html">
+<meta property="og:site_name" content="Fundamentals of Engineering">
+<meta property="og:description" content="Among the variety of models available in Machine Learning, most people will agree that Linear Regression is the most basic and simple one. However, this model incorporates almost all of the basic conc">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190809linearRegressionScratch/fig1.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190809linearRegressionScratch/fig2.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190809linearRegressionScratch/fig3.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190809linearRegressionScratch/fig4.png">
+<meta property="og:updated_time" content="2019-08-09T04:43:32.539Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linear Regression from Scratch with Python">
+<meta name="twitter:description" content="Among the variety of models available in Machine Learning, most people will agree that Linear Regression is the most basic and simple one. However, this model incorporates almost all of the basic conc">
+<meta name="twitter:image" content="http://eua.russano.github.io/images/20190809linearRegressionScratch/fig1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Fundamentals of Engineering" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fundamentals of Engineering</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://eua.russano.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-20190809linearRegressionScratch" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/20190809linearRegressionScratch/" class="article-date">
+  <time datetime="2019-08-09T04:00:00.000Z" itemprop="datePublished">2019-08-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linear Regression from Scratch with Python
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Among the variety of models available in Machine Learning, most people will agree that <strong>Linear Regression</strong> is the most basic and simple one. However, this model incorporates almost all of the basic concepts that are required to understand <strong>Machine Learning</strong> modelling.</p>
+<p>In this example, I will show how it is relatively simple to implement an univariate (one input, one output) linear regression model.<br><a id="more"></a></p>
+<p>Coming back to the theory, linear regression consists in a statistical hypothesis, stating that the relation between two (or more) variables is linear, i.e they increment by the same quantity, directly or inversely proportional. Finding an accurate linear regression validates such hypothesis applied to a certain dataset.</p>
+<p>The basic equation structure is:</p>
+<script type="math/tex; mode=display">
+y = \theta_0 + \theta_1 x</script><p>Where $y$ is the output (dependent variable), $x$ is the input, and $theta_0$ as well as $theta_1$ are the model parameters. The determination of a linear regression model consists in finding the optimum set of parameters that enables use to use the model to predict values of $y$ by using as input the values of $x$.</p>
+<p>To better understand, consider that one wants to predict the housing prices  in a certain neighborhood by using as input the house size. This makes sense, since one can logically imagine that bigger houses (higher area) will have higher prices. However, the hypothesis stated by the linear regression is that such relation between variables is linear.</p>
+<p>To evaluate that, let’s work with a “manually” created dataset, which will be easier since we will know from the beginning that the hypothesis is valid for it. And just to give a sense of real-world, we will add some noise to the expected output $y$.</p>
+<p>For visualization, we will use the library matplotlib.pyplot, and we will use the library random() to generate the white noise on the variable $y$. So we should import both of them right in the beginning.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> random</span><br></pre></td></tr></table></figure>
+<p>Now let’s create the variable $x$ and the variable $y$. I chose $y$ to be modelled according the following equation:</p>
+<script type="math/tex; mode=display">
+y = -1 + 2x + e</script><p>where $e$ consists in the error (white-noise). Ignoring this term, the linear regression parameters should be equal to $\theta_0 = -1$ and $\theta_1 = 2$ after the calibration process. The following code is used to generate the data.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = list(range(<span class="number">-10</span>,<span class="number">12</span>))</span><br><span class="line">y = [<span class="number">2</span>*xval<span class="number">-1</span> <span class="keyword">for</span> xval <span class="keyword">in</span> x]</span><br></pre></td></tr></table></figure>
+<p>The first step of pre-processing the data consists in performing normalization. This will transform the ranges from the original one to values between 0 and 1. The following formula is used for that.</p>
+<script type="math/tex; mode=display">
+x' = \frac{x - min(x)}{max(x) - min(x)}</script><p>The following code is used to perform normalization and also add the white-noide to the output variable $y$, so as to give it an apperance of real-world variable.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">random.seed(<span class="number">999</span>)</span><br><span class="line"><span class="comment"># normalize the values</span></span><br><span class="line">minx = min(x)</span><br><span class="line">maxx = max(x)</span><br><span class="line">miny = min(y)</span><br><span class="line">maxy = max(y)</span><br><span class="line">x = [(xval - minx)/(maxx-minx) <span class="keyword">for</span> xval <span class="keyword">in</span> x]</span><br><span class="line">y = [(yval - miny)/(maxy-miny) + random.random()/<span class="number">5</span> <span class="keyword">for</span> yval <span class="keyword">in</span> y] </span><br><span class="line">print(x)</span><br><span class="line">print(y)</span><br><span class="line"></span><br><span class="line">plt.plot(x,y,<span class="string">'o'</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/20190809linearRegressionScratch/fig1.png" alt="Generated data plot" title="Generated dataset."></p>
+<p>Assume an initial guess for the parameters of the linear regression model. From this value, we will iterate until the optimum values are found. Let’s assume that initially $\theta_0 = 0.5$ and $\theta_1 = 0$, which basically creates a flat (horizontal) line at y = 0.5.</p>
+<p><img src="/images/20190809linearRegressionScratch/fig2.png" alt="Initial linear model" title="Initial linear model when theta0 = 0.5 and theta1 = 0."></p>
+<p>It is possible to adjust the parameters of the linear regression model analytically, i.e with no iteration but using an equation. This analytical method is known as the Least Squares Method or the Normal Equation method. However, since this technique os almost only applicable to linear regression, I chooe to use the iterative approach, because it is more general and will give a better sense of how machine learning models are usually trained.</p>
+<p>The algorithm that we will use the Gradient Descent. A good explanation of it can be found in <a href="https://en.wikipedia.org/wiki/Gradient_descent" target="_blank" rel="noopener">Wikipedia</a> for instance, so I won’t bother myseelf to be writing here the basic concepts. Maybe I will leave that to another post.</p>
+<p>Applying the Gradient Descent method means to be updating iteratively the parameters of the linear regression model according the following formula.</p>
+<p>At each iteration until convergence:  </p>
+<script type="math/tex; mode=display">
+\theta_j^{n+1} = \theta_j^{n} - \alpha \times \frac{\partial J}{\partial \theta_j}</script><p>Where $j$ is the parameter index (in this case, 0 or 1), $\alpha$ is a constant called learning rate and adjusts the velocity of the update. The function $J$ is the one to be minimizes. In modelling, we usually want to minimize the errors of the model when compared with the observed value. So let’s say $J$ is the sum of the squared errors (to make everything positive).</p>
+<script type="math/tex; mode=display">
+J = \sum (y_{pred} - y)^2</script><p>Where $y_{pred}$ is the predicted output (from the model) and $y$ is the observed value (dataset). The derivatives with respect to each parameter can be written as:</p>
+<script type="math/tex; mode=display">
+\frac{\partial J}{\partial \theta_j} = \sum (y_{pred} - y)\times x_j</script><p>Where $x_j$ is the input multiplying $\theta_j$, so for $theta_0$, $x_0 = 1$, but for $\theta_1$ then it multiplies with the input variable $x$.</p>
+<p>We will do 100 iterations using a learning rate of 0.05. Also, we will collect the parameter and cost function $J$ evolution in lists called <code>theta_history</code> and <code>J</code>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">epochs = <span class="number">100</span> <span class="comment"># number of iterations</span></span><br><span class="line">learning_rate = <span class="number">0.05</span></span><br><span class="line"></span><br><span class="line">theta_history = [[theta0,theta1]]</span><br><span class="line">J = list()</span><br></pre></td></tr></table></figure>
+<p>Then, for each iteration, we calculate the const function $J$, the gradients with respect to each parameters, the update equation and the new prediction value.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> range(epochs):</span><br><span class="line">    J.append((sum([(ypredval-yval)**<span class="number">2</span> <span class="keyword">for</span> ypredval,yval <span class="keyword">in</span> zip(ypred,y)])))</span><br><span class="line">    print(<span class="string">'J = '</span>,J[<span class="number">-1</span>])</span><br><span class="line">    </span><br><span class="line">    dJd0 = (sum([ypredval - yval <span class="keyword">for</span> ypredval,yval <span class="keyword">in</span> zip(ypred,y)]))</span><br><span class="line">    dJd1 = (sum([(ypredval - yval)*xval <span class="keyword">for</span> ypredval,yval,xval <span class="keyword">in</span> zip(ypred,y,x)]))</span><br><span class="line">    </span><br><span class="line">    theta0 = theta0 - learning_rate*dJd0</span><br><span class="line">    theta1 = theta1 - learning_rate*dJd1</span><br><span class="line">    </span><br><span class="line">    theta_history.append([theta0,theta1])</span><br><span class="line">    </span><br><span class="line">    ypred = [theta0 + theta1*xval <span class="keyword">for</span> xval <span class="keyword">in</span> x]</span><br><span class="line">	</span><br><span class="line">plt.plot(J)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/20190809linearRegressionScratch/fig3.png" alt="Cost Function" title="Cost Function evolution."></p>
+<p>Notice how the cost function $J$ shown above drastically reduces initially, reaching a relatively stable plateau. That is normally expected when training a model. The plateau occurs because of convergence to the minimum is near to be satisfied, so the iteration process may be interrupted at a determined point of this process without losing too much accuracy.</p>
+<p>Notice now the model accuracy as plotted below.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.plot(x,y,<span class="string">'o'</span>)</span><br><span class="line">plt.plot(x,ypred,<span class="string">'+'</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/20190809linearRegressionScratch/fig4.png" alt="Cost Function" title="Predicted (+) and Observed (o) values."></p>
+<p>With this example, you have seen how it is possible and not so complicate to build a univariate linear regression with Python. Notice that we only used libraries for plotting and to create pseudo random numbers. Not even Numpy or Scipy was used.</p>
+<p>Thanks for reading this post and see you soon!</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://eua.russano.github.io/20190809linearRegressionScratch/" data-id="cjz3mrwaw0005x8u64222o7kw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GradientDescent/">GradientDescent</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LinearRegression/">LinearRegression</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scratch/">Scratch</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/20180810unitsDimensions/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Units and Dimensions - What are the differences</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GradientDescent/">GradientDescent</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LinearRegression/">LinearRegression</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PrinciplesOfEngineering/">PrinciplesOfEngineering</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ProcessOptimization/">ProcessOptimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scipy/">Scipy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scratch/">Scratch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GradientDescent/" style="font-size: 10px;">GradientDescent</a> <a href="/tags/LinearRegression/" style="font-size: 10px;">LinearRegression</a> <a href="/tags/Numpy/" style="font-size: 10px;">Numpy</a> <a href="/tags/PrinciplesOfEngineering/" style="font-size: 10px;">PrinciplesOfEngineering</a> <a href="/tags/ProcessOptimization/" style="font-size: 20px;">ProcessOptimization</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/Scipy/" style="font-size: 10px;">Scipy</a> <a href="/tags/Scratch/" style="font-size: 10px;">Scratch</a> <a href="/tags/Solver/" style="font-size: 10px;">Solver</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/20190809linearRegressionScratch/">Linear Regression from Scratch with Python</a>
+          </li>
+        
+          <li>
+            <a href="/20180810unitsDimensions/">Units and Dimensions - What are the differences</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationPython/">Using Python for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationExcel/">Using MS Excel Solver for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180731welcome/">Welcome</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Euan Russano<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
