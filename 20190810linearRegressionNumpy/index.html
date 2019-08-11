@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Tutorial - Multivariate Linear Regression with Numpy | Fundamentals of Engineering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Welcome to one more tutorial! In the last post (see here) we saw how to do a linear regression on Python using barely no library but native functions (except for visualization). In this exercise, we w">
+<meta name="keywords" content="Python,Numpy,Linear Regression,Gradient Descent">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial - Multivariate Linear Regression with Numpy">
+<meta property="og:url" content="http://eua.russano.github.io/20190810linearRegressionNumpy/index.html">
+<meta property="og:site_name" content="Fundamentals of Engineering">
+<meta property="og:description" content="Welcome to one more tutorial! In the last post (see here) we saw how to do a linear regression on Python using barely no library but native functions (except for visualization). In this exercise, we w">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190810linearRegressionNumpy/output_10_1.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190810linearRegressionNumpy/output_19_1.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190810linearRegressionNumpy/output_30_1.png">
+<meta property="og:image" content="http://eua.russano.github.io/images/20190810linearRegressionNumpy/output_32_1.png">
+<meta property="og:updated_time" content="2019-08-11T09:18:33.467Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tutorial - Multivariate Linear Regression with Numpy">
+<meta name="twitter:description" content="Welcome to one more tutorial! In the last post (see here) we saw how to do a linear regression on Python using barely no library but native functions (except for visualization). In this exercise, we w">
+<meta name="twitter:image" content="http://eua.russano.github.io/images/20190810linearRegressionNumpy/output_10_1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Fundamentals of Engineering" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fundamentals of Engineering</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://eua.russano.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-20190810linearRegressionNumpy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/20190810linearRegressionNumpy/" class="article-date">
+  <time datetime="2019-08-10T15:00:00.000Z" itemprop="datePublished">2019-08-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Tutorial - Multivariate Linear Regression with Numpy
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Welcome to one more tutorial! In the last post (see <a href="/20190809linearRegressionScratch/#more">here</a>) we saw how to do a linear regression on Python using barely no library but native functions (except for visualization).</p>
+<p>In this exercise, we will see how to implement a linear regression with multiple inputs using Numpy. We will also use the Gradient Descent algorithm to train our model.</p>
+<a id="more"></a>
+<p>The first step is to import all the necessary libraries. The ones we will use are:</p>
+<ul>
+<li>Numpy - for numerical calculations;</li>
+<li>Pandas - to read csv and data processing;</li>
+<li>Matplotlib - for visualization</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">import pandas as pd</span><br><span class="line">import matplotlib.pyplot as plt</span><br></pre></td></tr></table></figure>
+<p>Now import the data that we want to work on. This data (hypothetical) consists in the following information from real state properties:</p>
+<ul>
+<li>Size (the size of the housing in square meters);</li>
+<li>Nr Bedrooms -&gt;  the number of bedrooms;</li>
+<li>Nr Bathrooms -&gt; the number of bathrooms</li>
+<li>Price -&gt; The price of the house, in terms of thousands of dollars (or any other currency since the data is hypothetical)</li>
+</ul>
+<p><strong>Hypothesis</strong><br>The price is linearly correlated with the size, nr of bedrooms and nr of bathrooms of a housing.</p>
+<p>We will check validity of the above hypothesis through linear regression.</p>
+<p> Pandas function <code>read_csv()</code> is used to read the csv file ‘housingprices.csv’ and place it as a dataframe.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df= pd.read_csv(&apos;housingprices.csv&apos;)</span><br><span class="line">df.head()</span><br></pre></td></tr></table></figure>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Size</th>
+<th>Nr Bedrooms</th>
+<th>Nr Bathrooms</th>
+<th>Price</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>84</td>
+<td>1</td>
+<td>1</td>
+<td>43.747</td>
+</tr>
+<tr>
+<td>1</td>
+<td>45</td>
+<td>4</td>
+<td>1</td>
+<td>30.100</td>
+</tr>
+<tr>
+<td>2</td>
+<td>73</td>
+<td>1</td>
+<td>3</td>
+<td>39.481</td>
+</tr>
+<tr>
+<td>3</td>
+<td>34</td>
+<td>2</td>
+<td>3</td>
+<td>23.908</td>
+</tr>
+<tr>
+<td>4</td>
+<td>31</td>
+<td>4</td>
+<td>3</td>
+<td>24.144</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(df.columns)</span><br></pre></td></tr></table></figure>
+<pre><code>Index([&#39;Size&#39;, &#39;Nr Bedrooms&#39;, &#39;Nr Bathrooms&#39;, &#39;Price&#39;], dtype=&#39;object&#39;)
+</code></pre><p>A good practice, before performing any computation, is to check wheter the data contains invalued values (such as NaNs - not a number). This can be done using <code>pd.isna()</code> function, which returns a dataframe of True or False values. Since we want to summarize the results for each column initially and know wheter there is AT LEAST one invalid value, we can use the <code>any()</code> function, which returns True if there is any invalid number, otherwise False.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pd.isna(df).any()</span><br></pre></td></tr></table></figure>
+<pre><code>Size            False
+Nr Bedrooms     False
+Nr Bathrooms    False
+Price           False
+dtype: bool
+</code></pre><p>No invalid value was found in the dataframe.</p>
+<p>Split the dataset into inputs (x) and output(y). Use the method <code>values</code> to transform from a DataFrame object to an array object, which can efficiently managed by Numpy library.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x = df[[&apos;Size&apos;,&apos;Nr Bedrooms&apos;,&apos;Nr Bathrooms&apos;]].values</span><br><span class="line">y = df[&apos;Price&apos;].values.reshape(-1,1)</span><br><span class="line">m = len(y)</span><br><span class="line">print(m)</span><br></pre></td></tr></table></figure>
+<pre><code>99
+</code></pre><p>Let’s generate a simple visualization the price in relation to each input variable.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fig,axs = plt.subplots(2,2)</span><br><span class="line">axs[0, 0].plot(x[:,0],y,&apos;o&apos;)</span><br><span class="line">axs[0, 1].plot(x[:,1],y,&apos;o&apos;)</span><br><span class="line">axs[1, 0].plot(x[:,2],y,&apos;o&apos;)</span><br></pre></td></tr></table></figure>
+<pre><code>[&lt;matplotlib.lines.Line2D at 0x7f428efc30b8&gt;]
+</code></pre><p><img src="/images/20190810linearRegressionNumpy/output_10_1.png" alt="png"></p>
+<p>Linear correlation can be evaluated through Pearson’s coefficient, which returns a value between 0 and 1. 0 means there is no correlation, while 1 means perfect correlation. Everything in betweeen indicates that the data is somehow correlated, though usually a correlation of more than 0.8 is expected for a variable to be considered a predictor, i.e an input to a Machine Learning model.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Check correlation of each input with the input</span><br><span class="line">from scipy.stats import pearsonr</span><br><span class="line">print(f&apos;Correlation between x1 and y = &#123;pearsonr(x[:,0],y[:,0])[0]:.2f&#125;&apos;)</span><br><span class="line">print(f&apos;Correlation between x2 and y = &#123;pearsonr(x[:,1],y[:,0])[0]:.2f&#125;&apos;)</span><br><span class="line">print(f&apos;Correlation between x3 and y = &#123;pearsonr(x[:,2],y[:,0])[0]:.2f&#125;&apos;)</span><br></pre></td></tr></table></figure>
+<pre><code>Correlation between x1 and y = 0.97
+Correlation between x2 and y = 0.24
+Correlation between x3 and y = 0.11
+</code></pre><p>Results above shows that only the size shows high correlation with the price. Even though, we will keep the other variables as predictor, for the sake of this exercise of a multivariate linear regression.</p>
+<p>Add a bias column to the input vector. This is a column of ones so when we calibrate the parameters it will also multiply such bias.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Add a bias to the input vector</span><br><span class="line">X = np.concatenate((np.ones((len(x),1)),x),axis=1)</span><br><span class="line">X.shape</span><br></pre></td></tr></table></figure>
+<pre><code>(99, 4)
+</code></pre><p>Another important pre-processing is data normalization. In multivariate regression, the difference in the scale of each variable may cause difficulties for the optimization algorithm to converge, i.e to find the best optimum according the model structure. This procedure is also known as <strong>Feature Scaling</strong>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Xnorm = X.copy()</span><br><span class="line">minx = np.min(X[:,1:])</span><br><span class="line">maxx = np.max(X[:,1:])</span><br><span class="line">Xnorm[:,1:] = (X[:,1:]-minx)/(maxx-minx)</span><br><span class="line">Xnorm[:10,:]</span><br></pre></td></tr></table></figure>
+<pre><code>array([[1.        , 0.84693878, 0.        , 0.        ],
+       [1.        , 0.44897959, 0.03061224, 0.        ],
+       [1.        , 0.73469388, 0.        , 0.02040816],
+       [1.        , 0.33673469, 0.01020408, 0.02040816],
+       [1.        , 0.30612245, 0.03061224, 0.02040816],
+       [1.        , 0.30612245, 0.02040816, 0.01020408],
+       [1.        , 0.91836735, 0.03061224, 0.02040816],
+       [1.        , 0.33673469, 0.02040816, 0.01020408],
+       [1.        , 0.33673469, 0.03061224, 0.        ],
+       [1.        , 0.79591837, 0.02040816, 0.02040816]])
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ynorm = y.copy()</span><br><span class="line">maxy = np.max(y)</span><br><span class="line">miny = np.min(y)</span><br><span class="line">ynorm = (y-miny)/(maxy - miny) </span><br><span class="line">ynorm[:10,0]</span><br></pre></td></tr></table></figure>
+<pre><code>array([0.62943377, 0.28902469, 0.5230232 , 0.13457221, 0.14045897,
+       0.11666251, 0.92968321, 0.15153405, 0.19299077, 0.75762035])
+</code></pre><p>Now we are ready to start working on the model. It is reasonable to give an initial guess on the parameters and check this initial guess makes sense or is it complete nonsense. In this exercise, the choosen vector of parameters $\theta$ is </p>
+<script type="math/tex; mode=display">
+\theta = \begin{bmatrix}0.4 \\ 0.4 \\ 0.4 \\0.4 \end{bmatrix}</script><p>Notice that there are 4 parameters, which corresponds to the bias + the input variables from the data. The linear regression model works according the following formula.</p>
+<script type="math/tex; mode=display">
+Y = X\cdot \theta</script><p>Thus, $X$ is the input matrix with dimension (99,4), while the vector $theta$ is a vector of $(4,1)$, thus the resultant matrix has dimension $(99,1)$, which  indicates that our calculation process is correct.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># Initial estimate of parameters</span><br><span class="line">theta0 = np.zeros((X.shape[1],1))+0.4</span><br><span class="line">#theta0 = np.array([[0],[0.5],[2],[0.5]])</span><br><span class="line"></span><br><span class="line">ypred = Xnorm.dot(theta0)</span><br><span class="line"></span><br><span class="line">sortidx = np.argsort(ynorm[:,0]) # sort the values for better visualization</span><br><span class="line">plt.plot(ynorm[sortidx,0],&apos;o&apos;)</span><br><span class="line">plt.plot(ypred[sortidx,0],&apos;--&apos;)</span><br></pre></td></tr></table></figure>
+<pre><code>[&lt;matplotlib.lines.Line2D at 0x7f428ef8aef0&gt;]
+</code></pre><p><img src="/images/20190810linearRegressionNumpy/output_19_1.png" alt="png"></p>
+<p>Create a function <code>grad()</code> to compute the necessary gradients of the cost function. This is explained with higher details in the other post I mentioned in the beginning of this one. But only to remember, the gradient can be calculated as:</p>
+<script type="math/tex; mode=display">
+\frac{\partial J}{\partial \theta_j} = \frac{1}{m}\sum(f(\theta) - y)x_j</script><p>Where $j=0,1,..,3$ since there are four predictors. This will produce a derivative for each input $j$, thus the complete gradient consists on the vector:</p>
+<script type="math/tex; mode=display">
+\nabla J = [\frac{\partial J}{\partial \theta_0},...,\frac{\partial J}{\partial \theta_3}]</script><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># calculate gradient</span><br><span class="line">def grad(theta):</span><br><span class="line">    dJ = 1/m*np.sum((Xnorm.dot(theta)-ynorm)*Xnorm,axis=0).reshape(-1,1)</span><br><span class="line">    return dJ</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grad(theta0)</span><br></pre></td></tr></table></figure>
+<pre><code>array([[0.16830492],
+       [0.0739841 ],
+       [0.00197455],
+       [0.00134667]])
+</code></pre><p>Similarly, calculate the cost function, also known as objective function, which can be expressed as the sum of the squared errors, as follows.</p>
+<script type="math/tex; mode=display">
+J = \sum(f(\theta)-y)^2</script><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def cost(theta):</span><br><span class="line">    J = np.sum((Xnorm.dot(theta)-ynorm)**2,axis=0)[0]</span><br><span class="line">    return J</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cost(theta0)</span><br></pre></td></tr></table></figure>
+<pre><code>5.923489427685076
+</code></pre><p>We are ready to implement the Gradient Descent algorithm! The steps of this algorithm consists of:</p>
+<ul>
+<li>Obtain the gradients of the cost function according the actual value of the parameters;</li>
+<li>Calculate the cost to keep track of it;</li>
+<li>Update the parameters according the following schedule:</li>
+</ul>
+<script type="math/tex; mode=display">
+\theta^{i+1} = \theta^i - \alpha\times\nabla J(\theta^i)</script><p>Where the superscript $i$ refers to the current iteration. Then the iterative steps are repeated until the algorithm converges.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">def GD(theta0,learning_rate = 0.5,epochs=1000,TOL=1e-7):</span><br><span class="line">    </span><br><span class="line">    theta_history = [theta0]</span><br><span class="line">    J_history = [cost(theta0)]</span><br><span class="line">    </span><br><span class="line">    thetanew = theta0*10000</span><br><span class="line">    print(f&apos;epoch \t Cost(J) \t&apos;)</span><br><span class="line">    for epoch in range(epochs):</span><br><span class="line">        if epoch%100 == 0:</span><br><span class="line">            print(f&apos;&#123;epoch:5d&#125;\t&#123;J_history[-1]:7.4f&#125;\t&apos;)</span><br><span class="line">        dJ = grad(theta0)</span><br><span class="line">        J = cost(theta0)</span><br><span class="line">        </span><br><span class="line">        thetanew = theta0 - learning_rate*dJ</span><br><span class="line">        theta_history.append(thetanew)</span><br><span class="line">        J_history.append(J)</span><br><span class="line">        </span><br><span class="line">        if np.sum((thetanew - theta0)**2) &lt; TOL:</span><br><span class="line">            print(&apos;Convergence achieved.&apos;)</span><br><span class="line">            break</span><br><span class="line">        theta0 = thetanew</span><br><span class="line"></span><br><span class="line">    return thetanew,theta_history,J_history</span><br></pre></td></tr></table></figure>
+<p>In the above code, a maximum number of iterations is fixed. This avoid the algorithm to loop infinitely. Additionally, the iteration process is stopped if the following criteria is met at any point.</p>
+<script type="math/tex; mode=display">
+\sum(\theta^{i+1}-\theta^{i})^2 < \text{TOL}</script><p>Where TOL is a tolerance, i.e a maximum difference between the values of the parameters between iterations so it can be stated that the values converged.</p>
+<p>Next, evaluate the Gradient Descent to determine the optimum set of parameters for the linear regression.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">theta,theta_history,J_history = GD(theta0)</span><br></pre></td></tr></table></figure>
+<pre><code>epoch      Cost(J)     
+    0     5.9235    
+  100     0.5097    
+  200     0.3353    
+  300     0.3226    
+Convergence achieved.
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plt.plot(J_history)</span><br></pre></td></tr></table></figure>
+<pre><code>[&lt;matplotlib.lines.Line2D at 0x7f4283fff2e8&gt;]
+</code></pre><p><img src="/images/20190810linearRegressionNumpy/output_30_1.png" alt="png"></p>
+<p>Observe in the plot above how the cost function J drastically reduces at the initial iterations, converging to a value much smaller than the initial one. By using an appropriate Tolerance TOL, the iteration process was halted at less than 350 iterations, though the maximum number was initially fixed to 1000.</p>
+<p>We can perform predictions on the training set using the following code.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yprednorm = Xnorm.dot(theta)</span><br><span class="line"></span><br><span class="line">ypred = yprednorm*(maxy-miny) + miny</span><br><span class="line">plt.plot(y[sortidx,0],&apos;o&apos;)</span><br><span class="line">plt.plot(ypred[sortidx,0],&apos;--&apos;)</span><br></pre></td></tr></table></figure>
+<pre><code>[&lt;matplotlib.lines.Line2D at 0x7f4283fb4908&gt;]
+</code></pre><p><img src="/images/20190810linearRegressionNumpy/output_32_1.png" alt="png"></p>
+<p>The following function is to used to get an input, normalize it, perform predictions using the values of $\theta$ encountered, and denormalizing the output to come back to the original range.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def predict(x,theta):</span><br><span class="line">    xnorm = (x-minx)/(maxx-minx)</span><br><span class="line">    yprednorm = xnorm.dot(theta)</span><br><span class="line">    ypred = yprednorm*(maxy - miny) + miny</span><br><span class="line">    return ypred</span><br></pre></td></tr></table></figure>
+<p>Let’s use our model to predict the price of a house with 73 square meters, 1 bedroom and 1 bathroom.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = np.array([1,73,1,1])</span><br><span class="line"></span><br><span class="line">predict(x,theta)</span><br></pre></td></tr></table></figure>
+<pre><code>array([54.35879773])
+</code></pre><p>To confirm that the model is statistically significant, use the Pearson correlation and evaluate the predicted output against the observed one.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pearsonr(ypred.reshape(-1),y.reshape(-1))</span><br></pre></td></tr></table></figure>
+<pre><code>(0.9753195824331272, 1.930066280643269e-65)
+</code></pre><p>Notice here that the value of pearson correlation is 0.97 which indicates high correlation.<br>The second value (1.93e-65) is the p-value. It must be a very low value for us to reject the null hypothesis, i,e there is no initial hypothesis of linear correlation. Assuming 1% significance level, we have:<br>0.01 &gt;&gt; 1.93e-65 thus we can reject the null hypothesis thus indicating linear correlation between the prediction and observations.</p>
+<p>The Jupyter notebook for this tutorial can be downloaded from <a href="/data/20190810linearRegressionNumpy/linearRegressionNumpy.ipynb">here</a>!<br>If you want it as python code, download it <a href="/data/20190810linearRegressionNumpy/linearRegressionNumpy.py">here</a>!<br>See you next post!</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://eua.russano.github.io/20190810linearRegressionNumpy/" data-id="cjz6ratd8000t2ku63apf9gob" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradient-Descent/">Gradient Descent</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linear-Regression/">Linear Regression</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/20190809linearRegressionScratch/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Linear Regression from Scratch with Python</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradient-Descent/">Gradient Descent</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linear-Regression/">Linear Regression</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PrinciplesOfEngineering/">PrinciplesOfEngineering</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Process-Optimization/">Process Optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ProcessOptimization/">ProcessOptimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scipy/">Scipy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scratch/">Scratch</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/Gradient-Descent/" style="font-size: 15px;">Gradient Descent</a> <a href="/tags/Linear-Regression/" style="font-size: 15px;">Linear Regression</a> <a href="/tags/Numpy/" style="font-size: 15px;">Numpy</a> <a href="/tags/PrinciplesOfEngineering/" style="font-size: 10px;">PrinciplesOfEngineering</a> <a href="/tags/Process-Optimization/" style="font-size: 10px;">Process Optimization</a> <a href="/tags/ProcessOptimization/" style="font-size: 10px;">ProcessOptimization</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/Scipy/" style="font-size: 10px;">Scipy</a> <a href="/tags/Scratch/" style="font-size: 10px;">Scratch</a> <a href="/tags/Solver/" style="font-size: 10px;">Solver</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/20190810linearRegressionNumpy/">Tutorial - Multivariate Linear Regression with Numpy</a>
+          </li>
+        
+          <li>
+            <a href="/20190809linearRegressionScratch/">Linear Regression from Scratch with Python</a>
+          </li>
+        
+          <li>
+            <a href="/20180810unitsDimensions/">Units and Dimensions - What are the differences</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationPython/">Using Python for Process Optimization</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationExcel/">Using MS Excel Solver for Process Optimization</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Euan Russano<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
