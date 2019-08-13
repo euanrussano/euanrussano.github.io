@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>KMeans Clustering in Python step by step | Fundamentals of Machine Learning and Engineering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Hello! In this post I will teach you how to do a simple data classification using the KMeans algorithm. We will go through the concept of Kmeans first, and then dive into the Python code used to perfo">
+<meta name="keywords" content="Python,Numpy,Machine Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KMeans Clustering in Python step by step">
+<meta property="og:url" content="http://euan.russano.github.io/20190813kmeans/index.html">
+<meta property="og:site_name" content="Fundamentals of Machine Learning and Engineering">
+<meta property="og:description" content="Hello! In this post I will teach you how to do a simple data classification using the KMeans algorithm. We will go through the concept of Kmeans first, and then dive into the Python code used to perfo">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_4_1.png">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_8_1.png">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_16_1.png">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_20_1.png">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_28_1.png">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_30_1.png">
+<meta property="og:image" content="http://euan.russano.github.io/images/20190813kmeans/output_34_1.png">
+<meta property="og:updated_time" content="2019-08-13T13:37:41.957Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KMeans Clustering in Python step by step">
+<meta name="twitter:description" content="Hello! In this post I will teach you how to do a simple data classification using the KMeans algorithm. We will go through the concept of Kmeans first, and then dive into the Python code used to perfo">
+<meta name="twitter:image" content="http://euan.russano.github.io/images/20190813kmeans/output_4_1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Fundamentals of Machine Learning and Engineering" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fundamentals of Machine Learning and Engineering</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Exploring algorithms and concepts</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://euan.russano.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-20190813kmeans" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/20190813kmeans/" class="article-date">
+  <time datetime="2019-08-13T15:00:00.000Z" itemprop="datePublished">2019-08-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      KMeans Clustering in Python step by step
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Hello! In this post I will teach you how to do a simple data classification using the KMeans algorithm. We will go through the concept of Kmeans first, and then dive into the Python code used to perform the classification.</p>
+<a id="more"></a>
+<h2 id="What-is-KMeans-algorithm"><a href="#What-is-KMeans-algorithm" class="headerlink" title="What is KMeans algorithm?"></a>What is KMeans algorithm?</h2><p>Kmeans is a <strong>classifier</strong> algorithm. This means that it can attribute labels to data by identifying certain (hidden) patterns on it. It is also am <strong>unsupervised</strong> learning algorithm. It applies the labels without having a target, i.e a previously known label. Therefore, at the end of the training, it is up to the human behind the machine to understand what does the labels attributed mean and how this information can be interpreted.</p>
+<h3 id="KMeans-algorithm"><a href="#KMeans-algorithm" class="headerlink" title="KMeans algorithm"></a>KMeans algorithm</h3><p>KMeans performs data clustering by separating it into groups. Each group is clearly separated and do not overlap. A set of data points is said to belong to a group depending on its distance a point called the centroid.</p>
+<p>A centroid consists in a point, with the same dimension is the data (1D, 2D, 3D, etc). It is placed on the center of the cluster, thus being called a centroid. </p>
+<p>To exemplify, consider a point $x$ which we want to classify as label “banana”, “apple” or “orange”. KMeans works by measuring the distance of the point $x$ to the centroids of each cluster “banana”, “apple” or “orange”. Let’s say these distances are b1 (distance from $x$ to “banana” centroid), a1 (distance from $x$ to “apple” centroid) and o1 (distance from $x$ to “orange” centroid). If a1 is the smallest distance, then Kmeans says that $x$ belongs to “apple”. On the other hand, if b1 is the smallest, then $x$ belongs to “banana”, and so on.</p>
+<p>The distance we refer here can be measured in different forms. A very simple way, and very popular is the <strong>Euclidean Distance</strong>. In a 2D space, the Euclidean distance between a point at coordinates (x1,y1) and another point at (x2,y2) is:</p>
+<script type="math/tex; mode=display">
+d = \sqrt{(x_1-x_2)^2 + (y_1 - y_2)^2}</script><p>Similarly, in a 3D space, the distance between point (x1,y1,z1) and point (x2,y2,z2) is:</p>
+<script type="math/tex; mode=display">
+d = \sqrt{(x_1-x_2)^2 + (y_1 - y_2)^2 + (z_1 - z_2)^2}</script><p>Before going through how the training is done, let’s being to code our problem.</p>
+<h2 id="Using-Python-to-code-KMeans-algorithm"><a href="#Using-Python-to-code-KMeans-algorithm" class="headerlink" title="Using Python to code KMeans algorithm"></a>Using Python to code KMeans algorithm</h2><p>The Python libraries that we will use are:</p>
+<ul>
+<li>numpy -&gt; for numerical computations;</li>
+<li>matplotlib -&gt; for data visualization</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br></pre></td></tr></table></figure>
+<p>In this exercise we will work with an hypothetical dataset generated using random values. The distinction between the groups are made by shifting the first part of the dataset a bit higher in the feature space, while shifting the second part a bit lower. This will create two more or less distinguishible groups.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">X= <span class="number">-0.5</span> + np.random.rand(<span class="number">100</span>,<span class="number">2</span>)</span><br><span class="line">X1 = <span class="number">0.5</span> + np.random.rand(<span class="number">50</span>,<span class="number">2</span>)</span><br><span class="line">X[<span class="number">50</span>:<span class="number">100</span>, :] = X1</span><br><span class="line">plt.scatter(X[ : , <span class="number">0</span>], X[ :, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'k'</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f36e0519f98&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_4_1.png" alt="png"></p>
+<p>Now we place the centroids randomly in the feature space above (2D), by using the <code>rand()</code> function from Numpy.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">centroids = np.random.rand(<span class="number">2</span>,<span class="number">2</span>)</span><br><span class="line">centroids</span><br></pre></td></tr></table></figure>
+<pre><code>array([[0.38479822, 0.86872748],
+       [0.43462575, 0.45074992]])
+</code></pre><p>Let’s visualize the dataset and the centroids in the same plot. Notice that the randomly positioning of the centroids initially did not put them in the center of the spac, but a bit shifted to the left. This is not a big problem, since we will train the KMeans algorithm to correctly place the centroids to have a meaningful classification.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.scatter(X[ : , <span class="number">0</span>], X[ :, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'k'</span>)</span><br><span class="line">plt.scatter(centroids[:,<span class="number">0</span>],centroids[:,<span class="number">1</span>],s = <span class="number">50</span>, c = <span class="string">'b'</span>,marker = <span class="string">'+'</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f36e0488c18&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_8_1.png" alt="png"></p>
+<p>Using the function <code>np.linalg.norm()</code> from numpy we can calculate the Euclidean distance from each point to each centroid. For instance, the following code is used to calculate the distances from all the points stored in the variable $X$ to the first centroid. Then we print the first 10 distances.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dist = np.linalg.norm(X - centroids[<span class="number">0</span>,:],axis=<span class="number">1</span>).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">dist[:<span class="number">10</span>,:]</span><br></pre></td></tr></table></figure>
+<pre><code>array([[1.30319303],
+       [0.49796268],
+       [1.46371977],
+       [1.28519675],
+       [0.85744771],
+       [1.03826401],
+       [1.32784797],
+       [1.07535536],
+       [1.31616949],
+       [0.48383236]])
+</code></pre><p>Now we add the distance from all the points to the second centroid to the variable <code>dist</code> defined above. This will give as a matrix with N rows and 2 columns, where each row refers to one point of $X$, and each column is the distance value from one point to one of the centroids.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dist = np.append(dist,np.linalg.norm(X - centroids[<span class="number">1</span>,:],axis=<span class="number">1</span>).reshape(<span class="number">-1</span>,<span class="number">1</span>),axis=<span class="number">1</span>)</span><br><span class="line">dist[:<span class="number">10</span>,:]</span><br></pre></td></tr></table></figure>
+<pre><code>array([[1.30319303, 1.04360221],
+       [0.49796268, 0.33991696],
+       [1.46371977, 1.18050389],
+       [1.28519675, 0.91427689],
+       [0.85744771, 0.43937038],
+       [1.03826401, 0.72856256],
+       [1.32784797, 1.0784766 ],
+       [1.07535536, 0.79980759],
+       [1.31616949, 0.94513238],
+       [0.48383236, 0.12764052]])
+</code></pre><h3 id="How-to-train-KMeans-algorithm"><a href="#How-to-train-KMeans-algorithm" class="headerlink" title="How to train KMeans algorithm?"></a>How to train KMeans algorithm?</h3><p>The training is done by repeating the following algorithm, until convergence:</p>
+<ul>
+<li>Find the distance of each point to each cluster;</li>
+<li>Attribute each point to a cluster by finding the minimum distance;</li>
+<li>Update the position of each centroid by placing it at the average position of the cluster, according the point belonging to that cluster. This can be interpreted mathematically as:</li>
+</ul>
+<script type="math/tex; mode=display">
+c_j = \frac{1}{n}\sum x_j</script><p>Where $n$ is the number of points belonging to to the cluster $j$ and $c_j$ are the coordinates of the centroid of cluster $j$. $x_j$ are the points belonging to cluster $j$.</p>
+<ul>
+<li>Check if the centroid position is almost the same as in the previous iteration. If yes, then assume convergence. Otherwise, repeat the steps.</li>
+</ul>
+<h3 id="Implementing-the-Kmeans-training-algorithm"><a href="#Implementing-the-Kmeans-training-algorithm" class="headerlink" title="Implementing the Kmeans training algorithm"></a>Implementing the Kmeans training algorithm</h3><p>First we attribute each point of $X$ to a cluster by using the <code>np.argmin()</code> function, which will tell which column of <code>dist</code> is the lowest one, thus returning 0 (for the first cluster) or 1 (second cluster).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">classes = np.argmin(dist,axis=<span class="number">1</span>)</span><br><span class="line">classes</span><br></pre></td></tr></table></figure>
+<pre><code>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0,
+       0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0])
+</code></pre><p>Visualize how the points are being currently classified.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.scatter(X[classes == <span class="number">0</span>, <span class="number">0</span>], X[classes == <span class="number">0</span>, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'b'</span>)</span><br><span class="line">plt.scatter(X[classes == <span class="number">1</span>, <span class="number">0</span>], X[classes == <span class="number">1</span>, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'r'</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f36e03f6c18&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_16_1.png" alt="png"></p>
+<p>Now we update the position of each centroid, by calculating it at the mean position of the cluster. For instance, if a certain point has the points (1,0), (2,1) and (0.5,0.5), then the updated position of the centroid is:</p>
+<script type="math/tex; mode=display">
+c_j = ((1 + 2 + 0.5)/3, (0 + 1 + 0.5)/3)</script><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># update position</span></span><br><span class="line"><span class="keyword">for</span> class_ <span class="keyword">in</span> set(classes):</span><br><span class="line">    centroids[class_,:] = np.mean(X[classes == class_,:],axis=<span class="number">0</span>)</span><br><span class="line">centroids</span><br></pre></td></tr></table></figure>
+<pre><code>array([[0.96875375, 1.16083158],
+       [0.14974282, 0.11498078]])
+</code></pre><p>To understand what is happening here, let’s visualize the dataset with the updated positioning of the centroids.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plt.scatter(X[classes == <span class="number">0</span>, <span class="number">0</span>], X[classes == <span class="number">0</span>, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'b'</span>)</span><br><span class="line">plt.scatter(X[classes == <span class="number">1</span>, <span class="number">0</span>], X[classes == <span class="number">1</span>, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'r'</span>)</span><br><span class="line">plt.scatter(centroids[:,<span class="number">0</span>],centroids[:,<span class="number">1</span>],s = <span class="number">50</span>, c = <span class="string">'k'</span>,marker = <span class="string">'+'</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f36e0371208&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_20_1.png" alt="png"></p>
+<p>Then the complete training consists of running the same update over and over again, until the positions of the centroid stop changing significantly. In the following code, we define a class <code>KMeans</code> aggregating all the code explained above and runnign the training until convergence. The initialization consists in settinga a number <code>k</code> of classes. Then the method <code>train()</code> performs the training over a dataset, while the method <code>predict()</code> labels a new point according the positioning of the centroids stored in the object.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">KMeans</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,k)</span>:</span></span><br><span class="line">        self.k = k</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self,X,MAXITER = <span class="number">100</span>, TOL = <span class="number">1e-3</span>)</span>:</span></span><br><span class="line">        centroids = np.random.rand(self.k,X.shape[<span class="number">1</span>])</span><br><span class="line">        centroidsold = centroids.copy()</span><br><span class="line">        <span class="keyword">for</span> iter_ <span class="keyword">in</span> range(MAXITER):</span><br><span class="line">            dist = np.linalg.norm(X - centroids[<span class="number">0</span>,:],axis=<span class="number">1</span>).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">for</span> class_ <span class="keyword">in</span> range(<span class="number">1</span>,self.k):</span><br><span class="line">                dist = np.append(dist,np.linalg.norm(X - centroids[class_,:],axis=<span class="number">1</span>).reshape(<span class="number">-1</span>,<span class="number">1</span>),axis=<span class="number">1</span>)</span><br><span class="line">            classes = np.argmin(dist,axis=<span class="number">1</span>)</span><br><span class="line">            <span class="comment"># update position</span></span><br><span class="line">            <span class="keyword">for</span> class_ <span class="keyword">in</span> set(classes):</span><br><span class="line">                centroids[class_,:] = np.mean(X[classes == class_,:],axis=<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">if</span> np.linalg.norm(centroids - centroidsold) &lt; TOL:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">                print(<span class="string">'Centroid converged'</span>)</span><br><span class="line">        self.centroids = centroids</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self,X)</span>:</span></span><br><span class="line">        dist = np.linalg.norm(X - self.centroids[<span class="number">0</span>,:],axis=<span class="number">1</span>).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">for</span> class_ <span class="keyword">in</span> range(<span class="number">1</span>,self.k):</span><br><span class="line">            dist = np.append(dist,np.linalg.norm(X - self.centroids[class_,:],axis=<span class="number">1</span>).reshape(<span class="number">-1</span>,<span class="number">1</span>),axis=<span class="number">1</span>)</span><br><span class="line">        classes = np.argmin(dist,axis=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> classes</span><br></pre></td></tr></table></figure>
+<p>Let’s test our class by defining a KMeans classified with two centroids (k=2) and training in dataset $X$, as it was done step-by-step above.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kmeans = KMeans(<span class="number">2</span>)</span><br><span class="line">kmeans.train(X)</span><br></pre></td></tr></table></figure>
+<p>Check how each point of $X$ is being classified after complete training by using the <code>predict()</code> method we implemented above. Each poitn will be attributed to cluster 0 or cluster 1.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">classes = kmeans.predict(X)</span><br><span class="line">classes</span><br></pre></td></tr></table></figure>
+<pre><code>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+</code></pre><p>Let’s create a visualization of the final result, showing different colors for each cluster and the final position of the clusters (crosses in the plot).</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plt.scatter(X[classes == <span class="number">0</span>, <span class="number">0</span>], X[classes == <span class="number">0</span>, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'b'</span>)</span><br><span class="line">plt.scatter(X[classes == <span class="number">1</span>, <span class="number">0</span>], X[classes == <span class="number">1</span>, <span class="number">1</span>], s = <span class="number">20</span>, c = <span class="string">'r'</span>)</span><br><span class="line">plt.scatter(kmeans.centroids[:,<span class="number">0</span>],kmeans.centroids[:,<span class="number">1</span>],s = <span class="number">50</span>, c = <span class="string">'k'</span>,marker = <span class="string">'+'</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;matplotlib.collections.PathCollection at 0x7f36e0366550&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_28_1.png" alt="png"></p>
+<p>Notice that it converged to a meaningful classification. The centroid is placed in the average position of each part of the dataset initially created, whith clear separation between each class.</p>
+<p>For illustrative purposes, check how the same algorithm can work on a higher-dimensional problem with no modification of code.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">X= <span class="number">-0.5</span> + np.random.rand(<span class="number">100</span>,<span class="number">3</span>)</span><br><span class="line">X1 = <span class="number">0.5</span> + np.random.rand(<span class="number">33</span>,<span class="number">3</span>)</span><br><span class="line">X2 = <span class="number">2</span> + np.random.rand(<span class="number">33</span>,<span class="number">3</span>)</span><br><span class="line">X[<span class="number">33</span>:<span class="number">66</span>, :] = X1</span><br><span class="line">X[<span class="number">67</span>:, :] = X2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> mpl_toolkits.mplot3d <span class="keyword">import</span> Axes3D</span><br><span class="line">fig = plt.figure(figsize = (<span class="number">8</span>,<span class="number">5</span>))</span><br><span class="line">ax = fig.add_subplot(<span class="number">111</span>, projection=<span class="string">'3d'</span>)</span><br><span class="line">ax.scatter(X[:,<span class="number">0</span>],X[:,<span class="number">1</span>],X[:,<span class="number">2</span>])</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;mpl_toolkits.mplot3d.art3d.Path3DCollection at 0x7f36e02d3eb8&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_30_1.png" alt="png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kmeans = KMeans(<span class="number">3</span>)</span><br><span class="line">kmeans.train(X)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kmeans.centroids</span><br></pre></td></tr></table></figure>
+<pre><code>array([[-8.37067587e-03,  8.14157596e-02,  8.20878102e-04],
+       [ 2.48077027e+00,  2.53459418e+00,  2.44018103e+00],
+       [ 9.97370193e-01,  1.07463989e+00,  1.00277423e+00]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">classes = kmeans.predict(X)</span><br><span class="line">classes</span><br></pre></td></tr></table></figure>
+<pre><code>array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+       0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure(figsize = (<span class="number">8</span>,<span class="number">5</span>))</span><br><span class="line">ax = fig.add_subplot(<span class="number">111</span>, projection=<span class="string">'3d'</span>)</span><br><span class="line">ax.scatter(X[classes == <span class="number">0</span>,<span class="number">0</span>],X[classes == <span class="number">0</span>,<span class="number">1</span>],X[classes == <span class="number">0</span>,<span class="number">2</span>])</span><br><span class="line">ax.scatter(X[classes == <span class="number">1</span>,<span class="number">0</span>],X[classes == <span class="number">1</span>,<span class="number">1</span>],X[classes == <span class="number">1</span>,<span class="number">2</span>])</span><br><span class="line">ax.scatter(X[classes == <span class="number">2</span>,<span class="number">0</span>],X[classes == <span class="number">2</span>,<span class="number">1</span>],X[classes == <span class="number">2</span>,<span class="number">2</span>])</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;mpl_toolkits.mplot3d.art3d.Path3DCollection at 0x7f36e01f5438&gt;
+</code></pre><p><img src="/images/20190813kmeans/output_34_1.png" alt="png"></p>
+<p><strong>Download the Jupyter notebook of this post <a href="/data/20190813kmeans/kmeans.ipynb">here!</a></strong><br><strong>Download the Python code of this post <a href="/data/20190813kmeans/kmeans.py">here!</a></strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://euan.russano.github.io/20190813kmeans/" data-id="cjz9vnbvc000ugwu6scjp6o03" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Machine-Learning/">Machine Learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/20190810linearRegressionNumpy/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Tutorial - Multivariate Linear Regression with Numpy</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradient-Descent/">Gradient Descent</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linear-Regression/">Linear Regression</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Machine-Learning/">Machine Learning</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Principles-of-Engineering/">Principles of Engineering</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Process-Optimization/">Process Optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scipy/">Scipy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/Gradient-Descent/" style="font-size: 13.33px;">Gradient Descent</a> <a href="/tags/Linear-Regression/" style="font-size: 13.33px;">Linear Regression</a> <a href="/tags/Machine-Learning/" style="font-size: 16.67px;">Machine Learning</a> <a href="/tags/Numpy/" style="font-size: 16.67px;">Numpy</a> <a href="/tags/Principles-of-Engineering/" style="font-size: 10px;">Principles of Engineering</a> <a href="/tags/Process-Optimization/" style="font-size: 13.33px;">Process Optimization</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/Scipy/" style="font-size: 10px;">Scipy</a> <a href="/tags/Solver/" style="font-size: 10px;">Solver</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/20190813kmeans/">KMeans Clustering in Python step by step</a>
+          </li>
+        
+          <li>
+            <a href="/20190810linearRegressionNumpy/">Tutorial - Multivariate Linear Regression with Numpy</a>
+          </li>
+        
+          <li>
+            <a href="/20190809linearRegressionScratch/">Linear Regression from Scratch with Python</a>
+          </li>
+        
+          <li>
+            <a href="/20180810unitsDimensions/">Units and Dimensions - What are the differences</a>
+          </li>
+        
+          <li>
+            <a href="/20180804optimizationPython/">Using Python for Process Optimization</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Euan Russano<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
