@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Tutorial&#34;:&#34; Implement a Neural Network from Scratch with Python | Fundamentals of Machine Learning and Engineering</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="In this tutorial, we will see how to write code to run a neural network model that can be used for regression or classification problems.We will NOT use fancy libraries like Keras, Pytorch or Tensorfl">
+<meta name="keywords" content="Python,Machine Learning,Neural Network">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial&quot;:&quot; Implement a Neural Network from Scratch with Python">
+<meta property="og:url" content="http://euan.russano.github.io/20190821neuralNetworkScratch/index.html">
+<meta property="og:site_name" content="Fundamentals of Machine Learning and Engineering">
+<meta property="og:description" content="In this tutorial, we will see how to write code to run a neural network model that can be used for regression or classification problems.We will NOT use fancy libraries like Keras, Pytorch or Tensorfl">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-08-21T22:15:17.970Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tutorial&quot;:&quot; Implement a Neural Network from Scratch with Python">
+<meta name="twitter:description" content="In this tutorial, we will see how to write code to run a neural network model that can be used for regression or classification problems.We will NOT use fancy libraries like Keras, Pytorch or Tensorfl">
+  
+    <link rel="alternate" href="/atom.xml" title="Fundamentals of Machine Learning and Engineering" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Fundamentals of Machine Learning and Engineering</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Exploring algorithms and concepts</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://euan.russano.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-20190821neuralNetworkScratch" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/20190821neuralNetworkScratch/" class="article-date">
+  <time datetime="2019-08-21T04:00:00.000Z" itemprop="datePublished">2019-08-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Tutorial&#34;:&#34; Implement a Neural Network from Scratch with Python
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>In this tutorial, we will see how to write code to run a neural network model that can be used for regression or classification problems.<br>We will <strong>NOT</strong> use fancy libraries like Keras, Pytorch or Tensorflow. Instead the neural network will be implemented using only numpy for numerical computation and scipy for the training process.</p>
+<a id="more"></a>
+<p>The necessary libraries are:</p>
+<ul>
+<li>Numpy: for numerical computation;</li>
+<li>Scipy.optimize.minimize: to train the neural network;</li>
+<li>Scipy.stats.pearsonr: to test goodness of fit.</li>
+</ul>
+<p>I will go over these libraries with a bit more detail later. First, import all the libraries mentioned above.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> minimize</span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> pearsonr</span><br></pre></td></tr></table></figure>
+<p>The dataset used consists in a simple way, containing the following data, stored in <em>data.csv</em>:</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>x_1</th>
+<th>x_2</th>
+<th>y</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">data = []</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'data.csv'</span>,<span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.readline()</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        line = [float(val) <span class="keyword">for</span> val <span class="keyword">in</span> line[:<span class="number">-1</span>].split(<span class="string">','</span>)]</span><br><span class="line">        data.append(line)</span><br><span class="line">data = np.array(data)</span><br><span class="line">data</span><br></pre></td></tr></table></figure>
+<pre><code>array([[1., 0., 1.],
+       [0., 1., 0.],
+       [1., 1., 0.],
+       [0., 0., 1.]])
+</code></pre><p>Separate the columns, using the first two for the input <code>X</code>, while the last column is considered the output <code>y</code>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">X = data[:,<span class="number">0</span>:<span class="number">2</span>]</span><br><span class="line">y = data[:,<span class="number">2</span>].reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">print(X)</span><br><span class="line">print(y)</span><br></pre></td></tr></table></figure>
+<pre><code>[[1. 0.]
+[0. 1.]
+ [1. 1.]
+ [0. 0.]]
+[[1.]
+ [0.]
+ [0.]
+ [1.]]
+</code></pre><h2 id="Structuring-the-Neural-Network"><a href="#Structuring-the-Neural-Network" class="headerlink" title="Structuring the Neural Network"></a>Structuring the Neural Network</h2><p>The neural network consists in a mathematical model that mimics the human brain, through the concepts of connected nodes in a network, with a propagation of signal. Each neuron contains an activation function, which may vary depending on the problem and on the programmer. A very common function used due to its felixibility and capablity of generation is the sigmoid (or logistic) function, which can be written as:</p>
+<script type="math/tex; mode=display">
+y = \frac{1}{1+e^{-w x}}</script><p>Where $w$ are the weights (parameters) of the nerual network which should be optimized. The following function can be used in Python to define the sigmoid function.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid</span><span class="params">(w,x)</span>:</span></span><br><span class="line">    <span class="comment"># x - Nx2 input matrix</span></span><br><span class="line">    <span class="comment"># w - 2x1 parameter vector</span></span><br><span class="line">    <span class="comment"># output should be 4x1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>/(<span class="number">1</span>+np.exp(x.dot(w)))</span><br></pre></td></tr></table></figure>
+<p>The following cell is used to test the function above for correctnes fo the result. A dummy weight vector <code>w</code> is created for the purpose of this testing.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># test sigmoid function</span></span><br><span class="line">w = np.array([<span class="number">0.5</span>,<span class="number">-0.5</span>]).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">print(sigmoid(w,X))</span><br></pre></td></tr></table></figure>
+<pre><code>[[0.37754067]
+ [0.62245933]
+ [0.5       ]
+ [0.5       ]]
+</code></pre><p>We will implement the neural network using an Object-Oriented approach. This means we will write a class which will emulathe the model, and it will contain the functions to optimize its parameters and to test it, i.e perform predictions. Start by writing the class definition using the keyword <code>class</code> and the initialization function, contained in the <code>__init__()</code> function.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NeuralNetwork</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,x,y,neurons)</span>:</span></span><br><span class="line">        self.input = x</span><br><span class="line">        self.obsOutput = y</span><br><span class="line">        self.output = np.zeros((y.shape[<span class="number">0</span>],<span class="number">1</span>))</span><br><span class="line">        self.inputWeights = np.random.rand(x.shape[<span class="number">1</span>],neurons)</span><br><span class="line">        self.outputWeights = np.random.rand(neurons,<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>The class <code>NeuralNetwork</code> contain the following properties, as specified above:</p>
+<ul>
+<li>It stores the inputs in a property <code>input</code></li>
+<li>It stores the observed outputs (targets) in a property <code>y</code></li>
+<li>The shape of the targets is used to generate the output array, stored in <code>output</code> property. It is initialized with zeros.</li>
+<li>The weights of the inputs are stored in <code>inputWeights</code>. It is initialized with random values, and its shape is properly configured using the input <code>x</code> array and the number of neurons <code>neurons</code>.</li>
+<li>The weights of the hidden layer are stored in <code>outputWeights</code>. It is initialized with random values, and its shape is properly configured using the number of neurons <code>neurons</code>.</li>
+</ul>
+<p>Let’s test and see if the <code>NeuralNetwork</code> class is not throwing any errors up to this point.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net = NeuralNetwork(X,y,<span class="number">2</span>)</span><br><span class="line">print(net.inputWeights)</span><br><span class="line">print(net.outputWeights)</span><br></pre></td></tr></table></figure>
+<pre><code>[[0.90518084 0.71031147]
+ [0.75555662 0.19589718]]
+[[0.00156605]
+ [0.64047559]]
+</code></pre><p>Notice that the values of weights, printed above, are simple generated randomly and do not hold any meaning up to this point.</p>
+<p>We can obtain the output of the hidden layer by applying the <code>sigmoid</code> function to the input weights of the neural network and the input array, as shown below.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># How to obtain the output of the hidden layer neurons</span></span><br><span class="line">sigmoid(net.inputWeights,X)</span><br></pre></td></tr></table></figure>
+<pre><code>array([[0.287987  , 0.32953002],
+       [0.31961175, 0.45118172],
+       [0.15966303, 0.28777629],
+       [0.5       , 0.5       ]])
+</code></pre><p>To extend it, the output of the complete network is obtained by doing matrix multiplication of the <code>outputWeights</code> with the output of the hidden layer, shown above.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># How to obtain the output of the output layer neuron (assuming linear)</span></span><br><span class="line">sigmoid(net.inputWeights,X).dot(net.outputWeights)</span><br></pre></td></tr></table></figure>
+<pre><code>array([[0.21150694],
+       [0.28947141],
+       [0.18456373],
+       [0.32102082]])
+</code></pre><p>Let’s make this code a bit more permanent, by writing a function <code>predict</code>, which we will use to generate the output of the neural network given an array of input. This function can be appended to the class <code>NeuralNetwork</code>, by using the <code>setattr</code> function of Python. Notice that this function work in the following way:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">setattr(class_name,method_to_be_created,function_name)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">class_name -&gt; name of the class which the function will be appended to.</span></span><br><span class="line"><span class="string">method_to_be_created -&gt; a string defining the name of the method implemented in the class, so it can be called by</span></span><br><span class="line"><span class="string">                        using class_name.method_name()</span></span><br><span class="line"><span class="string">function_name -&gt; a call to the function to be appended, in this case predict.</span></span><br><span class="line"><span class="string">'''</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Implementation of the prediction process of ANN</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self,X)</span>:</span></span><br><span class="line">    <span class="comment"># hidden layer output HL</span></span><br><span class="line">    self.HL =  sigmoid(self.inputWeights,X)</span><br><span class="line">    <span class="comment"># output layer (network output)</span></span><br><span class="line">    self.OL = self.HL.dot(self.outputWeights)</span><br><span class="line">    <span class="keyword">return</span> self.OL</span><br><span class="line"></span><br><span class="line"><span class="comment"># give the method to the class Neural Network</span></span><br><span class="line">setattr(NeuralNetwork,<span class="string">'predict'</span>,predict)</span><br></pre></td></tr></table></figure>
+<p>A very interesting fact is that, once the new method is appended to the class, every object previously created will already contain the method. We can test it by calling the <code>predict</code> method from the object <code>net</code> already created.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.predict(X)</span><br></pre></td></tr></table></figure>
+<pre><code>array([[0.21150694],
+       [0.28947141],
+       [0.18456373],
+       [0.32102082]])
+</code></pre><h2 id="Training-the-neural-network"><a href="#Training-the-neural-network" class="headerlink" title="Training the neural network"></a>Training the neural network</h2><p>Here comes what I see as the most complex part to be implemented in the model, the training part. It consists in basic two main things:</p>
+<ul>
+<li>cost function - a way of evaluating how good the model is with its current parameters;</li>
+<li>optimization function - a way of reducing the cost by modifying the value of the parameters;</li>
+</ul>
+<p>To avoid growing too much the complexity of this exercise, we will use the <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html" target="_blank" rel="noopener"><code>minimize</code></a> from the package <code>scipy.optimize</code>. This function will take as arguments the cost function, which we will implement, and the parameters.</p>
+<p>The issue here is that the <code>minimize</code> function is build to take the parameters to be optimized as a single vector. However, you saw that in the structure of our neural network we have the neural networ as matrices stored in two properties: <code>inputWeights</code> and <code>outputWeights</code>. So we need to join them to (using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.concatenate.html" target="_blank" rel="noopener"><code>np.concatenate()</code></a>) and them reshape it to one row, using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.reshape.html" target="_blank" rel="noopener"><code>np.reshape</code></a>.</p>
+<p>Also, after the optimization we have to get the optimum parameters and reshape them again to place back in <code>inputWeights</code> and <code>outputWeights</code>.</p>
+<p>Again, we define the function and append it to the class <code>NeuralNetwork</code> using the <code>setattr</code> function.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fit</span><span class="params">(self)</span>:</span></span><br><span class="line">    x0 = np.concatenate([net.inputWeights,net.outputWeights.T]).reshape(<span class="number">-1</span>,)</span><br><span class="line">    res = minimize(self.cost,x0)</span><br><span class="line">    </span><br><span class="line">    self.inputWeights = res.x.reshape(<span class="number">3</span>,<span class="number">-1</span>)[:<span class="number">-1</span>,:]</span><br><span class="line">    self.outputWeights = res.x.reshape(<span class="number">3</span>,<span class="number">-1</span>)[<span class="number">-1</span>,:].reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">setattr(NeuralNetwork,<span class="string">'fit'</span>,fit)</span><br></pre></td></tr></table></figure>
+<p>To calculate the <strong>cost</strong>, we need to define a way to define a value that will tell us how good the model is. Intuitively, we can think in terms of the <strong>errors</strong>. If errors are high, then the cost should be high. On the other hand, a low cost should indicate a low error. So let’s start defining what is an error.<br><em>The error consists in the absolute difference between the expected value (target) and the predicted value.</em><br>This difference can be mathematically expressed as:</p>
+<script type="math/tex; mode=display">
+(y_{obs} - y_{pred})</script><p>Where $y<em>{obs}$ is the observed value and expected result, while $y</em>{pred}$ is the output of the neural network, the predicted result. Suppose that we have the following observations $y_{obs}$:</p>
+<script type="math/tex; mode=display">
+y_{obs} = [1,-1,-1]</script><p>And the corresponding predictions are:</p>
+<script type="math/tex; mode=display">
+y_{obs} = [1,1,-3]</script><p>Obtaining the errors</p>
+<script type="math/tex; mode=display">
+(y_{obs} - y_{pred}) = [(1-1),(-1-(1)),(-1-(-3))] = [0,-2,2]</script><p>We obtain a vector with 3 errors, each one corresponding to a pair expected/predicted value. But the cost needs to be a single value. Again, intuitively, we could think of obtaining a single error value by summing up all the errors. Doing that for the vector above produces,</p>
+<script type="math/tex; mode=display">
+0 + (-2) + 2 = 0</script><p>The sum of errors is 0! This result make it looks like there is no error, though we already know that there is differences between prediction and target. This can be corrected by squaring each value and them summing it up.</p>
+<script type="math/tex; mode=display">
+0^2 + (-2)^2 + 2^2 = 8</script><p>If this method, we avoid error cancellation, because any value will become positive. This metric is called the sum of squared errors (SSE), and can be expressed generically as:</p>
+<script type="math/tex; mode=display">
+J = \sum (y_{obs} - y_{pred})^2</script><p>If we desire to obtain an average squared error instead of the sum, we can divide the SSE by the number of points, thus obtaining the mean of squared errors (MSE), expressed as:</p>
+<script type="math/tex; mode=display">
+J = \frac{1}{n}\sum (y_{obs} - y_{pred})^2</script><p>For this exercise let’s use the SSE as our cost. We define a function to calcualte that and append it to the class, as it was done with previous methods.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cost</span><span class="params">(self,x)</span>:</span></span><br><span class="line">    self.inputWeights = x.reshape(<span class="number">3</span>,<span class="number">-1</span>)[:<span class="number">-1</span>,:]</span><br><span class="line">    self.outputWeights = x.reshape(<span class="number">3</span>,<span class="number">-1</span>)[<span class="number">-1</span>,:].reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    ypred = self.predict(self.input)</span><br><span class="line">    </span><br><span class="line">    J = np.sum((self.obsOutput - ypred)**<span class="number">2</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> J</span><br><span class="line"></span><br><span class="line">setattr(NeuralNetwork,<span class="string">'cost'</span>,cost)</span><br></pre></td></tr></table></figure>
+<p>Test the cost by calling it once (remember to concatenate and reshape the weights so it works properly!)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.cost(np.concatenate([net.inputWeights,net.outputWeights.T]))</span><br></pre></td></tr></table></figure>
+<pre><code>1.2005915066240083
+</code></pre><p>Now we can call the fit() method on the neural network to find the optimum parameters that will show the minimum error of the predictions and observations. This is done in the following code. Notice that the output shown is the result from the minimize function on scipy.optimize.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.fit()</span><br></pre></td></tr></table></figure>
+<pre><code>      fun: 2.255136144862212e-09
+ hess_inv: array([[ 4.14164529e+03,  7.06430001e+03,  1.78716005e+05,
+         2.61958344e+05, -2.18298665e+04,  2.18235283e+04],
+       [ 7.06430001e+03,  1.20546383e+04,  3.04875328e+05,
+         4.46879826e+05, -3.72395856e+04,  3.72291055e+04],
+       [ 1.78716005e+05,  3.04875328e+05,  7.71449754e+06,
+         1.13077626e+07, -9.42327432e+05,  9.42039179e+05],
+       [ 2.61958344e+05,  4.46879826e+05,  1.13077626e+07,
+         1.65747049e+07, -1.38124557e+06,  1.38082329e+06],
+       [-2.18298665e+04, -3.72395856e+04, -9.42327432e+05,
+        -1.38124557e+06,  1.15106690e+05, -1.15070568e+05],
+       [ 2.18235283e+04,  3.72291055e+04,  9.42039179e+05,
+         1.38082329e+06, -1.15070568e+05,  1.15035689e+05]])
+      jac: array([-2.44188025e-08, -3.92603844e-06, -5.85603566e-10, -3.89227306e-09,
+        2.09829900e-06,  3.32048000e-06])
+  message: &#39;Optimization terminated successfully.&#39;
+     nfev: 264
+      nit: 32
+     njev: 33
+   status: 0
+  success: True
+        x: array([ 6.56030353e-01, -4.35259814e-03,  7.77890879e+00,  1.11330054e+01,
+        1.36193289e-02,  1.98637937e+00])
+</code></pre><p>To finish the exercise, let’s generate a vector of predictions using the optimum parameters and compare it with the observations. We test how good this prediction is by using the pearson coefficient, also from scipy package.</p>
+<p>Pearson coefficient (also known as R-squared) is a value that ranges from 0-1, where 1 is a perfect prediction (all the predictions match the targets), while 0 means that the predictions are as good as using the average target as a predictor (a quite poor model). Therefore our objective is to obtain a pearson coefficient as near to 1 as possible.</p>
+<p>The pearsonr() function also returns a value which is the p-value. I will not enter into details about this statistical parameter here, but what is important to mention is that it should be as low as possible, ideally less than 0.05 or 0.01, so we can statistically accept the predictions.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ypred = net.predict(X)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pearsonr(y,ypred)</span><br></pre></td></tr></table></figure>
+<pre><code>(array([1.]), array([7.01427805e-12]))
+</code></pre><p>The Jupyter notebook for this tutorial can be downloaded from <a href="/data/20190820neuralNetworkScratch/neuralNetworkScratch.ipynb">here</a>!<br>If you want it as python code, download it <a href="/data/20190820neuralNetworkScratch/neuralNetworkScratch.py">here</a>!<br>See you next post!</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://euan.russano.github.io/20190821neuralNetworkScratch/" data-id="cjzlth8iv000v5ku6p3kw9s01" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Machine-Learning/">Machine Learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Neural-Network/">Neural Network</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/20190813kmeans/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">KMeans Clustering in Python step by step</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradient-Descent/">Gradient Descent</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linear-Regression/">Linear Regression</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Machine-Learning/">Machine Learning</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Neural-Network/">Neural Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Numpy/">Numpy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Principles-of-Engineering/">Principles of Engineering</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Process-Optimization/">Process Optimization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scipy/">Scipy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Solver/">Solver</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/Gradient-Descent/" style="font-size: 12.5px;">Gradient Descent</a> <a href="/tags/Linear-Regression/" style="font-size: 12.5px;">Linear Regression</a> <a href="/tags/Machine-Learning/" style="font-size: 17.5px;">Machine Learning</a> <a href="/tags/Neural-Network/" style="font-size: 10px;">Neural Network</a> <a href="/tags/Numpy/" style="font-size: 15px;">Numpy</a> <a href="/tags/Principles-of-Engineering/" style="font-size: 10px;">Principles of Engineering</a> <a href="/tags/Process-Optimization/" style="font-size: 12.5px;">Process Optimization</a> <a href="/tags/Python/" style="font-size: 20px;">Python</a> <a href="/tags/Scipy/" style="font-size: 10px;">Scipy</a> <a href="/tags/Solver/" style="font-size: 10px;">Solver</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/20190821neuralNetworkScratch/">Tutorial&#34;:&#34; Implement a Neural Network from Scratch with Python</a>
+          </li>
+        
+          <li>
+            <a href="/20190813kmeans/">KMeans Clustering in Python step by step</a>
+          </li>
+        
+          <li>
+            <a href="/20190810linearRegressionNumpy/">Tutorial - Multivariate Linear Regression with Numpy</a>
+          </li>
+        
+          <li>
+            <a href="/20190809linearRegressionScratch/">Linear Regression from Scratch with Python</a>
+          </li>
+        
+          <li>
+            <a href="/20180810unitsDimensions/">Units and Dimensions - What are the differences</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Euan Russano<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
